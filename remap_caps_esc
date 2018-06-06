@@ -1,0 +1,20 @@
+#! /bin/sh
+# Remap escape
+
+# Find the value of Escape key ("keycode   9" on a US keyboard.)
+esc_val=$(xmodmap -pke | grep "keycode   9" | sed 's/keycode   9 = //; s/NoSymbol Caps_Lock//; s/NoSymbol Escape//')
+
+if [ $esc_val = "Escape" ]; then
+  xmodmap -e 'keycode 66 = Escape'
+  xmodmap -e 'keycode 9 = Caps_Lock'
+  xmodmap -e 'clear Lock'
+elif [ $esc_val = "Caps_Lock" ]; then
+  xmodmap -e 'keycode 9 = Escape'
+  xmodmap -e 'keycode 66 = Caps_Lock'
+  xmodmap -e 'clear Lock'
+else
+  echo "Unknown value detected. Setting to default."
+  xmodmap -e 'keycode 9 = Escape'
+  xmodmap -e 'keycode 66 = Caps_Lock'
+  xmodmap -e 'clear Lock'
+fi
