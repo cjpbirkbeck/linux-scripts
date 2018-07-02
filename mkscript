@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# This creates any number of shell scripts with the given names.
+
+# Set defaults
+name=script
+template=shell
+shell_type=bourne
+for_all=false
+comment=true
+
+declare -A shell_headers=( \
+  ["bourne"]="#!/bin/sh" \
+  ["bash"]="#!/usr/bin/env bash" \
+  ["python"]="#!/usr/bin/env python" \
+  ["lua"]="#!/usr/bin/env lua" \
+  ["nix"]="#!/usr/bin/env nix-shell"
+)
+
+declare -A suffix=( \
+  ["python"]=".py" \
+  ["lua"]=".lua" \
+  ["nix"]=".nix"
+)
+
+
+get_help () {
+  echo -e "Print help here."
+}
+
+mktemplated () {
+  cp ~/Templates/shell .
+  mv ./shell $name
+}
+
+# Makes the file in a given location.
+create () {
+  touch $name
+  echo -e ${shell_headers[${shell_type}]} >> $name
+  if [ $comment ]; then
+    echo -e "# Description of script goes here." >> $name
+  fi
+}
+
+# Makes a given file executable. By default, will be only executable by the
+# owner, but it can be set to be executable by all users.
+mkexec ()  {
+  if [ !$for_all ]; then
+    chmod u=rwx $name
+  else
+    chmod 711 $name
+  fi
+}
+
+if [ -z "$1" ]; then
+  echo "No arguments present. Exiting."
+  exit 1
+fi
+
+while [ true ]; do
+  case $1 in
+    -h|-\?|--help)
+      get_help
+      exit
+      ;;
+    -a|--all)
+      for_all=true
+      shift
+      ;;
+    -d|--directory)
+      if [ "$2" ]; then
+        cd "$2"
+        shift
+      else
+        echo "No directory specified. Exiting."
+        exit 1
+      fi
+      ;;
+    -t|--type)
+      if [ "$2" ]; then
+        shell_type="$2"
+        shift
+      else
+        echo "No type specified. Exiting."
+        exit 1
+      fi
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -?*)
+      printf 'Unknown option ignored: %s\n' "$1" >&2
+      ;;
+    *)
+      break
+  esac
+
+  shift
+done
+
+for command in $@; do
+  name=$command
+  create
+  mkexec
+done
