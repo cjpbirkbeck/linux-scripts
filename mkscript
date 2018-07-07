@@ -3,28 +3,69 @@
 
 # Set defaults
 name=script
-template=shell
-shell_type=bourne
+shell_type=bash
 for_all=false
 comment=true
+no_suffix=false
 
-declare -A shell_headers=( \
-  ["bourne"]="#!/bin/sh" \
-  ["bash"]="#!/usr/bin/env bash" \
-  ["python"]="#!/usr/bin/env python" \
-  ["lua"]="#!/usr/bin/env lua" \
-  ["nix"]="#!/usr/bin/env nix-shell"
-)
+usage () {
+  echo -e "Automatically writes a blank script for a given script.\n \
+usage mkscript [-a|--all] [-d|--directory] [-s|-suffix] [-t|--type program name] files\n \
+   -a|--all                    set script to be executable for all user \n\
+    -d|--directory location     sets the directory where scripts will be placed \n\
+    -s|--suffix                 supresses suffixes for shell scripts. \n\
+    -t|--type script-type       changes the type of the script. "
+  exit 1;
+}
 
-declare -A suffix=( \
-  ["python"]=".py" \
-  ["lua"]=".lua" \
-  ["nix"]=".nix"
-)
-
-
-get_help () {
-  echo -e "Print help here."
+# This will get the various elements for making the script.
+set_elements() {
+  case "$shell_type" in
+    "bash")
+      hashbang="#!/usr/bin/env bash"
+      suffix=".sh"
+      comment_start="#"
+      comment_end=""
+      no_suffix=true
+      ;;
+    "python" | "python3" )
+      hashbang="#!/usr/bin/env nix-shell \\n#! nix-shell -i python3 \"python3.withPackages(ps: [])\""
+      suffix=".sh"
+      comment_start="#"
+      comment_end=""
+      ;;
+    "python2" )
+      hashbang="#!/usr/bin/env nix-shell \\n#! nix-shell -i python2 \"python3.withPackages(ps: [])\""
+      suffix=".sh"
+      comment_start="#"
+      comment_end=""
+      ;;
+    "python-nix" | "python3-nix" )
+      hashbang=""
+      suffix=".py"
+      comment_start="#"
+      comment_end=""
+      ;;
+    "python2-nix" )
+      hashbang=""
+      suffix=".py"
+      comment_start="#"
+      comment_end=""
+      ;;
+    "nix" )
+      hashbang="#!/usr/bin/env nix-shell"
+      suffix=".nix"
+      comment_start="#"
+      comment_end=""
+      ;;
+    * )
+      hashbang="#!/bin/sh"
+      suffix=".sh"
+      comment_start="#"
+      comment_end=""
+      no_suffix=true
+      ;;
+  esac
 }
 
 mktemplated () {
@@ -34,17 +75,20 @@ mktemplated () {
 
 # Makes the file in a given location.
 create () {
+  if [ $no_suffix = false ] && [ $shell_type = "bash" ] || [ $shell_type = "bourne" ]; then
+    name+=${suffix}
+  fi
   touch $name
-  echo -e ${shell_headers[${shell_type}]} >> $name
+  echo -e "${hashbang}" >> $name
   if [ $comment ]; then
-    echo -e "# Description of script goes here." >> $name
+    echo -e "${comment_start} Description of script goes here. ${comment_end}" >> $name
   fi
 }
 
 # Makes a given file executable. By default, will be only executable by the
 # owner, but it can be set to be executable by all users.
 mkexec ()  {
-  if [ !$for_all ]; then
+  if [ ! $for_all ]; then
     chmod u=rwx $name
   else
     chmod 711 $name
@@ -56,10 +100,10 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-while [ true ]; do
+while true ; do
   case $1 in
     -h|-\?|--help)
-      get_help
+      usage
       exit
       ;;
     -a|--all)
@@ -68,12 +112,15 @@ while [ true ]; do
       ;;
     -d|--directory)
       if [ "$2" ]; then
-        cd "$2"
+        cd "$2" || echo "Cannot find directory. Exiting"; exit 1
         shift
       else
         echo "No directory specified. Exiting."
         exit 1
       fi
+      ;;
+    -s|--suffix)
+      no_suffix=true
       ;;
     -t|--type)
       if [ "$2" ]; then
@@ -98,8 +145,9 @@ while [ true ]; do
   shift
 done
 
-for command in $@; do
+for command in "$@"; do
   name=$command
+  set_elements
   create
   mkexec
 done
