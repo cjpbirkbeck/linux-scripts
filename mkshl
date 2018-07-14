@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Creates various shell scripts.
+
+name=script
+shell_type=bash
+readable_by_others=false
+suffix=true
+
+declare -A hashbang=( \
+  ["bourne"]="#!/bin/sh" \
+  ["bash"]="#!/usr/bin/env bash" \
+  ["zsh"]="#!/usr/bin/env zsh")
+
+# Creates the file and put some starting information.
+create () {
+  if [ suffix ]; then
+    name+=".sh"
+  fi
+  touch $name
+  echo -e "${hashbang[${shell_type}]}" >> $name
+  echo -e "# Describe script here." >> $name
+  echo -e "# Created on $(date '+%A %B %d, %Y')." >> $name
+}
+
+# Makes the script executable.
+mkexec () {
+  if [ ! $readable_by_others ]; then
+    chmod u=rwx $name
+  else
+    chmod 711 $name
+  fi
+}
+
+# while getopts 
+
+for command in "$@"; do
+  name=$command
+  create
+  mkexec
+done
