@@ -3,7 +3,7 @@
 
 name=script
 shell_type=bash
-readable_by_others=false
+public=false
 suffix=true
 
 declare -A hashbang=( \
@@ -11,27 +11,74 @@ declare -A hashbang=( \
   ["bash"]="#!/usr/bin/env bash" \
   ["zsh"]="#!/usr/bin/env zsh")
 
+process_args() {
+  # Stuff happens
+  while true ; do
+    case $1 in
+      -b|--bin)
+        cd "$HOME/bin"
+        ;;
+      -h|-\?|--help)
+        usage
+        exit
+        ;;
+      -l|--location)
+        if [ "$2" ]; then
+          cd "$2" || echo "Cannot find directory $2 . Exiting"; exit 1
+          shift
+        else
+          echo "No directory specifed. Exiting"
+          exit 1
+        fi
+        ;;
+      -p|--public)
+        public=true
+        shift
+        ;;
+      -n|--no-suffix)
+        suffix=false
+        shift
+        ;;
+      --)
+        shift
+        break
+        ;;
+      -?*)
+        printf 'Unknown option ignored: %s\n' "$1" >&2
+        ;;
+      *)
+        break
+    esac
+
+    shift
+  done
+}
+
 # Creates the file and put some starting information.
 create () {
-  if [ suffix ]; then
+  if [ $suffix ]; then
+    unprefixed=$name
     name+=".sh"
   fi
   touch $name
   echo -e "${hashbang[${shell_type}]}" >> $name
   echo -e "# Describe script here." >> $name
   echo -e "# Created on $(date '+%A %B %d, %Y')." >> $name
+  echo -e "# Created by Christopher Birkbeck" >> $name
+  if [ $suffix ] && [[ $(pwd) == "$HOME/bin" ]]; then
+    echo "alias ${unprefixed}=${name}" >> ~/.bashrc
+    echo "alias ${unprefixed}=${name}" >> ~/.zshrc
+  fi
 }
 
 # Makes the script executable.
 mkexec () {
-  if [ ! $readable_by_others ]; then
+  if [ ! $public ]; then
     chmod u=rwx $name
   else
     chmod 711 $name
   fi
 }
-
-# while getopts 
 
 for command in "$@"; do
   name=$command
