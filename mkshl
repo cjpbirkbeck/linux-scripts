@@ -3,12 +3,14 @@
 
 name=script
 shell_type=bash
+mk_nix_shell=false
 public=false
 suffix=true
 
 declare -A hashbang=( \
   ["bourne"]="#!/bin/sh" \
   ["bash"]="#!/usr/bin/env bash" \
+  ["nix"]="#!/usr/bin/env nix-shell" \
   ["zsh"]="#!/usr/bin/env zsh")
 
 process_args() {
@@ -31,13 +33,38 @@ process_args() {
           exit 1
         fi
         ;;
+      -n|--no-suffix)
+        suffix=false
+        shift
+        ;;
       -p|--public)
         public=true
         shift
         ;;
-      -n|--no-suffix)
-        suffix=false
-        shift
+      -t|--type)
+        if [ "$2" ]; then
+          case "$2" in
+            bourne|sh)
+              shell_type="bourne"
+              ;;
+            bash)
+              shell_type="bash"
+              ;;
+            nix)
+              shell_type="nix"
+              mk_nix_shell=true
+              ;;
+            zsh)
+              shell_type="zsh"
+              ;;
+            *)
+              echo "Unknown shell type specified. Exiting."
+              exit 1
+              ;;
+          esac
+        else
+          echo "No type specified. Defaulting to bash"
+        fi
         ;;
       --)
         shift
@@ -63,6 +90,9 @@ create () {
   touch $name
   echo -e "${hashbang[${shell_type}]}" >> $name
   echo -e "# Describe script here." >> $name
+  if ( mk_nix_shell ) ; then
+    echo -e "#! nix-shell # Put options here. " >> $name
+  fi
   echo -e "# Created on $(date '+%A %B %d, %Y')." >> $name
   echo -e "# Created by Christopher Birkbeck" >> $name
   if [ $suffix ] && [[ $(pwd) == "$HOME/bin" ]]; then
