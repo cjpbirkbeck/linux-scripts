@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Creates various shell scripts.
 
-name=script
+# name=script
 shell_type=bash
 mk_nix_shell=false
+real_interpreter="bash"
 public=false
 suffix=true
 
@@ -15,18 +16,20 @@ declare -A hashbang=( \
 
 # Creates the file and put some starting information.
 create () {
+  local name="$1"
+
   if [ $suffix ]; then
     unprefixed=$name
     name+=".sh"
   fi
   touch $name
-  echo -e "${hashbang[${shell_type}]}" >> $name
+  { echo -e "${hashbang[${shell_type}]}";
   if ( $mk_nix_shell ) ; then
-    echo -e "#! nix-shell # Put options here. " >> $name
+    echo -e "#! nix-shell -i ${real_interpreter} # Put options here. ";
   fi
-  echo -e "# Describe script here." >> $name
-  echo -e "# Created on $(date '+%A %B %d, %Y')." >> $name
-  echo -e "# Created by Christopher Birkbeck" >> $name
+  echo -e "# Describe script here.";
+  echo -e "# Created on $(date '+%A %B %d, %Y').";
+  echo -e "# Created by Christopher Birkbeck"; } >> $name
   if [ $suffix ] && [[ $(pwd) == "$HOME/bin" ]]; then
     echo "alias ${unprefixed}=${name}" >> ~/.bashrc
     echo "alias ${unprefixed}=${name}" >> ~/.zshrc
@@ -35,6 +38,12 @@ create () {
 
 # Makes the script executable.
 mkexec () {
+  local name="$1"
+
+  if ( $suffix ); then
+    name+=".sh"
+  fi
+
   if [ ! $public ]; then
     chmod u=rwx $name
   else
@@ -46,7 +55,7 @@ mkexec () {
 while true ; do
   case $1 in
     -b|--bin)
-      cd "$HOME/bin"
+      cd "$HOME/bin" || mkdir "$HOME/bin" || echo "Error. Cannot find or create ~/bin/. Exiting." ; exit 1
       ;;
     -h|-\?|--help)
       usage
@@ -81,6 +90,18 @@ while true ; do
           nix)
             shell_type="nix"
             mk_nix_shell=true
+            if [ "$3" ]; then
+              case "$3" in
+                bash)
+                  real_interpreter="bash"
+                  ;;
+                python)
+                  real_interpreter="python"
+                  ;;
+                *)
+                  ;;
+              esac
+            fi
             ;;
           zsh)
             shell_type="zsh"
@@ -109,7 +130,6 @@ while true ; do
 done
 
 for command in "$@"; do
-  name=$command
-  create
-  mkexec
+  create "$command"
+  mkexec "$command"
 done
