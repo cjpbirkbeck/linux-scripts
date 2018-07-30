@@ -13,74 +13,6 @@ declare -A hashbang=( \
   ["nix"]="#!/usr/bin/env nix-shell" \
   ["zsh"]="#!/usr/bin/env zsh")
 
-process_args() {
-  # Stuff happens
-  while true ; do
-    case $1 in
-      -b|--bin)
-        cd "$HOME/bin"
-        ;;
-      -h|-\?|--help)
-        usage
-        exit
-        ;;
-      -l|--location)
-        if [ "$2" ]; then
-          cd "$2" || echo "Cannot find directory $2 . Exiting"; exit 1
-          shift
-        else
-          echo "No directory specifed. Exiting"
-          exit 1
-        fi
-        ;;
-      -n|--no-suffix)
-        suffix=false
-        shift
-        ;;
-      -p|--public)
-        public=true
-        shift
-        ;;
-      -t|--type)
-        if [ "$2" ]; then
-          case "$2" in
-            bourne|sh)
-              shell_type="bourne"
-              ;;
-            bash)
-              shell_type="bash"
-              ;;
-            nix)
-              shell_type="nix"
-              mk_nix_shell=true
-              ;;
-            zsh)
-              shell_type="zsh"
-              ;;
-            *)
-              echo "Unknown shell type specified. Exiting."
-              exit 1
-              ;;
-          esac
-        else
-          echo "No type specified. Defaulting to bash"
-        fi
-        ;;
-      --)
-        shift
-        break
-        ;;
-      -?*)
-        printf 'Unknown option ignored: %s\n' "$1" >&2
-        ;;
-      *)
-        break
-    esac
-
-    shift
-  done
-}
-
 # Creates the file and put some starting information.
 create () {
   if [ $suffix ]; then
@@ -89,10 +21,10 @@ create () {
   fi
   touch $name
   echo -e "${hashbang[${shell_type}]}" >> $name
-  echo -e "# Describe script here." >> $name
-  if ( mk_nix_shell ) ; then
+  if ( $mk_nix_shell ) ; then
     echo -e "#! nix-shell # Put options here. " >> $name
   fi
+  echo -e "# Describe script here." >> $name
   echo -e "# Created on $(date '+%A %B %d, %Y')." >> $name
   echo -e "# Created by Christopher Birkbeck" >> $name
   if [ $suffix ] && [[ $(pwd) == "$HOME/bin" ]]; then
@@ -109,6 +41,72 @@ mkexec () {
     chmod 711 $name
   fi
 }
+
+# Process arguments
+while true ; do
+  case $1 in
+    -b|--bin)
+      cd "$HOME/bin"
+      ;;
+    -h|-\?|--help)
+      usage
+      exit
+      ;;
+    -l|--location)
+      if [ "$2" ]; then
+        cd "$2" || echo "Cannot find directory $2 . Exiting"; exit 1
+        shift
+      else
+        echo "No directory specifed. Exiting"
+        exit 1
+      fi
+      ;;
+    -n|--no-suffix)
+      suffix=false
+      shift
+      ;;
+    -p|--public)
+      public=true
+      shift
+      ;;
+    -t|--type)
+      if [ "$2" ]; then
+        case "$2" in
+          bourne|sh)
+            shell_type="bourne"
+            ;;
+          bash)
+            shell_type="bash"
+            ;;
+          nix)
+            shell_type="nix"
+            mk_nix_shell=true
+            ;;
+          zsh)
+            shell_type="zsh"
+            ;;
+          *)
+            echo "Unknown shell type specified. Exiting."
+            exit 1
+            ;;
+        esac
+      else
+        echo "No type specified. Defaulting to bash"
+      fi
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -?*)
+      printf 'Unknown option ignored: %s\n' "$1" >&2
+      ;;
+    *)
+      break
+  esac
+
+  shift
+done
 
 for command in "$@"; do
   name=$command
