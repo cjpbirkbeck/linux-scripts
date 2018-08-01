@@ -47,7 +47,7 @@ mkexec () {
   if [ ! $public ]; then
     chmod u=rwx $name
   else
-    chmod 711 $name
+    chmod 722 $name
   fi
 }
 
@@ -101,6 +101,8 @@ while true ; do
                 *)
                   ;;
               esac
+
+              shift
             fi
             ;;
           zsh)
