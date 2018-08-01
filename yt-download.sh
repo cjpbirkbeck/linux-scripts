@@ -4,13 +4,14 @@
 # Created by Christopher Birkbeck
 
 while true; do
-  case "$1"; do
+  case "$1" in
     -n|--name)
       new_dir="$1"
       ;;
     --)
       shift
       break
+      ;;
     *)
       break
       ;;
