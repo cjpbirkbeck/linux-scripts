@@ -1,6 +1,0 @@
-#!/bin/sh
-# Combines rebuilding, garbage collection and optimizing the system
-
-nixos-rebuild switch --update
-nix-garbage-college --delete-older-than 14d
-nix-store --optimise

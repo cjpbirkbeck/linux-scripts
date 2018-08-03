@@ -45,9 +45,9 @@ mkexec () {
   fi
 
   if [ ! $public ]; then
-    chmod u=rwx $name
+    chmod 700 $name
   else
-    chmod 722 $name
+    chmod 755 $name
   fi
 }
 
