@@ -7,6 +7,8 @@ mk_nix_shell=false
 real_interpreter="bash"
 public=false
 suffix=true
+in_bin=false
+sub=misc
 
 declare -A hashbang=( \
   ["bourne"]="#!/bin/sh" \
@@ -17,11 +19,12 @@ declare -A hashbang=( \
 # Creates the file and put some starting information.
 create () {
   local name="$1"
+  local subdir="$2"
 
   if [ $suffix ]; then
-    unprefixed=$name
     name+=".sh"
   fi
+
   touch $name
   { echo -e "${hashbang[${shell_type}]}";
   if ( $mk_nix_shell ) ; then
@@ -30,9 +33,8 @@ create () {
   echo -e "# Describe script here.";
   echo -e "# Created on $(date '+%A %B %d, %Y').";
   echo -e "# Created by Christopher Birkbeck"; } >> $name
-  if [ $suffix ] && [[ $(pwd) == "$HOME/bin" ]]; then
-    echo "alias ${unprefixed}=${name}" >> ~/.bashrc
-    echo "alias ${unprefixed}=${name}" >> ~/.zshrc
+  if ( $in_bin ) || [[ $(pwd) == "$HOME/bin" ]] || [[ $(cd ..; pwd) == "$HOME/bin" ]]; then
+    ln -s "$HOME/bin/$subdir/$name" "$HOME/bin/$(basename $name .sh)"
   fi
 }
 
@@ -55,7 +57,14 @@ mkexec () {
 while true ; do
   case $1 in
     -b|--bin)
-      cd "$HOME/bin" || mkdir "$HOME/bin" || echo "Error. Cannot find or create ~/bin/. Exiting." ; exit 1
+      in_bin=true
+      if [ "$2" ] && [ "${2:0}" != "-" ]; then
+        sub="$2"
+        cd "./$HOME/bin/$sub" || echo "Cannot find bin or $sub directories. Exiting." >2 ; exit 1
+      else
+        sub="misc"
+        cd "./$HOME/bin/misc" || echo "Cannot find bin or misc directories. Exiting." >2 ; exit 1
+      fi
       ;;
     -h|-\?|--help)
       usage
@@ -132,6 +141,6 @@ while true ; do
 done
 
 for command in "$@"; do
-  create "$command"
+  create "$command" "$sub"
   mkexec "$command"
 done
