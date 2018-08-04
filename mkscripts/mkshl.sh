@@ -21,6 +21,8 @@ create () {
   local name="$1"
   local subdir="$2"
 
+  echo "Creating $name in $subdir"
+
   if [ $suffix ]; then
     name+=".sh"
   fi
@@ -58,12 +60,13 @@ while true ; do
   case $1 in
     -b|--bin)
       in_bin=true
-      if [ "$2" ] && [ "${2:0}" != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0}" != "-" ]; then
         sub="$2"
-        cd "./$HOME/bin/$sub" || echo "Cannot find bin or $sub directories. Exiting." >2 ; exit 1
+        cd "$HOME/bin/$sub" && pwd || echo "Cannot find bin or $sub directories. Exiting." 
+        shift
       else
         sub="misc"
-        cd "./$HOME/bin/misc" || echo "Cannot find bin or misc directories. Exiting." >2 ; exit 1
+        cd "./$HOME/bin/misc" || echo "Cannot find bin or misc directories. Exiting."
       fi
       ;;
     -h|-\?|--help)
@@ -141,6 +144,7 @@ while true ; do
 done
 
 for command in "$@"; do
+  echo "Processing $command in $sub"
   create "$command" "$sub"
   mkexec "$command"
 done
