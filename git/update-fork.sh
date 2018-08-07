@@ -7,9 +7,9 @@ if [ -n "$1" ]; then
   cd "$1" || echo "Error. Cannot find directory $1. Exiting."
   git status
 
-  if [ "$2" -ne 128 ]; then
+  if [ "$?" -ne 128 ]; then
     git fetch upstream
-    
+
     git merge upstream/master
     git push -u origin master
   else

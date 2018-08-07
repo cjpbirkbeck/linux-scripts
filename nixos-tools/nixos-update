@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Combines rebuilding, garbage collection and optimizing the system
 
-nixos-rebuild switch --update | tee /var/lastupdate.log && \
-nix-garbage-collect --delete-older-than 14d | tee -a /var/lastupdate.log && \
+nixos-rebuild switch --upgrade | tee /var/lastupdate.log && \
+nix-collect-garbage --delete-older-than 14d | tee -a /var/lastupdate.log && \
 nix-store --optimise | tee -a /var/lastupdate.log

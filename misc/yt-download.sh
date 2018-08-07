@@ -5,8 +5,13 @@
 
 while true; do
   case "$1" in
-    -n|--name)
-      new_dir="$1"
+    -d|--directory)
+      if [ -n "$2" ]; then
+        new_dir="$1"
+      else
+        echo "Error. No directory specified. Exiting"
+        exit 1
+      fi
       ;;
     --)
       shift
