@@ -3,11 +3,11 @@
 # Note to run this script, you must add '.' in front of it to run it in the current subsell. You can alias the command to do this automatically.
 
 if [ -n "$1" ]; then
-  npath=`nix path-info $(which $1)`
+  npath=$(nix path-info $(which $1))
   echo $npath
 
   cd $npath
 else
   echo "No valid package. exiting."
-  return 1
+  exit 1
 fi
