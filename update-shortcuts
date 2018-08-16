@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Updates the shortcuts file.
+# Christopher Birkbeck 2018
+
+# Traverse the entire bin directory to find any new files.
+function add_new {
+  cd "$1" || { echo "Error. Cannot find or make $1 Exiting." >2; Exit 1; }
+
+  for file in *; do
+    if [[ -d $file ]] && [[ $file != ".git" ]]; then
+      add_new $file
+    else
+      if [[ $file =~ (.*).sh ]]; then
+        name=${file:0:-3}
+      else
+        name=$file
+      fi
+
+      orginal=$(readlink -f $file)
+
+      echo -e "alias $name=\"$orginal\"" >> $HOME/bin/shortcuts
+    fi
+  done
+
+  cd ..
+}
+
+# Removes any duplicated lines.
+function remove_duplicates {
+  awk '!seen[$0]++' $HOME/bin/shortcuts > $HOME/bin/shortcuts-tmp
+  rm $HOME/bin/shortcuts
+  mv $HOME/bin/shortcuts-tmp $HOME/bin/shortcuts
+}
+
+# Verifies any existing entries still exist.
+function verify {
+  while IFS= read -r line; do
+    current=$(sed -E -e 's,alias (.*)=\"(.*)\",\2,g' <<< "$line")
+
+    if [[ -f "$current" ]]; then
+      echo "Found $current"
+      continue
+    else
+      sed -i -E -e "s,alias (.*)=\"$current\",,g" $HOME/bin/shortcuts
+    fi
+  done <$HOME/bin/shortcuts
+}
+
+cd $HOME/bin || mkdir $HOME/bin || { echo "Error. Cannot find or make $HOME/bin. Exiting." >2; Exit 1; }
+
+add_new $HOME/bin
+remove_duplicates
+verify

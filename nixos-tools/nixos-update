@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Combines rebuilding, garbage collection and optimizing the system
 
-nixos-rebuild switch --upgrade | tee /tmp/lastupdate.log && \
-nix-collect-garbage --delete-older-than 14d | tee -a /tmp/lastupdate.log && \
-nix-store --optimise | tee -a /tmp/lastupdate.log
+if [[ $(whoami) == "root" ]]; then
+  nixos-rebuild switch --upgrade  &&
+  nix-collect-garbage --delete-older-than 14d  &&
+  nix-store --optimise
+else
+  echo "These commands must be run as root."
+  exit 1
+fi
