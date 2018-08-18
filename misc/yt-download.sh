@@ -25,11 +25,16 @@ while true; do
   shift
 done
 
-cd ~/Music
-if [ -n "$new_dir" ]; then
+# cd ~/Music
+if [ -z "$new_dir" ]; then
   new_dir="$(date '+%B_%d_%Y_%H_%M')"
 fi
-mkdir $new_dir && cd $new_dir || echo "Error. Cannot make or change to $new_dir. Exiting."; exit 1
+
+mkdir $new_dir && cd $new_dir
+
+if [ "$?" -ne 0 ]; then
+  echo "Error. Cannot make or change to $new_dir. Exiting."; exit 1; 
+fi
 
 for arg in "$@"; do
   youtube-dl -f 140 "$arg"
