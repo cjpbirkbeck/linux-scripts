@@ -19,15 +19,12 @@ declare -A hashbang=( \
 # Creates the file and put some starting information.
 create () {
   local name="$1"
-  local subdir="$2"
+  local original="$1"
 
-  echo "Creating $name in $subdir"
-
-  if [ $suffix ]; then
+  if ( $suffix ); then
     name+=".sh"
   fi
 
-  touch $name
   { echo -e "${hashbang[${shell_type}]}";
   if ( $mk_nix_shell ) ; then
     echo -e "#! nix-shell -i ${real_interpreter} # Put options here. ";
@@ -35,8 +32,11 @@ create () {
   echo -e "# Describe script here.";
   echo -e "# Created on $(date '+%A %B %d, %Y').";
   echo -e "# Created by Christopher Birkbeck"; } >> $name
-  if ( $in_bin ) || [[ $(pwd) == "$HOME/bin" ]] || [[ $(cd ..; pwd) == "$HOME/bin" ]]; then
-    ln -s "$HOME/bin/$subdir/$name" "$HOME/bin/$(basename $name .sh)"
+
+  local location=$(readlink -f $name)
+
+  if [[ $location =~ $HOME/bin/* ]]; then
+    echo -e "alias $original=\"$location\"" >> "$HOME/bin/shortcuts"
   fi
 }
 
@@ -59,14 +59,18 @@ mkexec () {
 while true ; do
   case $1 in
     -b|--bin)
-      in_bin=true
       if [ -n "$2" ] && [ "${2:0}" != "-" ]; then
         sub="$2"
-        cd "$HOME/bin/$sub" && pwd || echo "Cannot find bin or $sub directories. Exiting." 
+        cd "$HOME/bin/$sub" || mkdir "$HOME/bin/$sub"
         shift
       else
         sub="misc"
-        cd "./$HOME/bin/misc" || echo "Cannot find bin or misc directories. Exiting."
+        cd "./$HOME/bin/misc" || mkdir "$HOME/bin/misc"
+      fi
+
+      if [[ "$?" -ne 0 ]]; then
+        echo "Cannot find bin or $sub directories. Exiting."
+        exit 1
       fi
       ;;
     -h|-\?|--help)
@@ -75,7 +79,7 @@ while true ; do
       ;;
     -l|--location)
       if [ "$2" ]; then
-        cd "$2" || echo "Cannot find directory $2 . Exiting"; exit 1
+        cd "$2" || { echo "Cannot find directory $2 . Exiting"; exit 1; }
         shift
       else
         echo "No directory specifed. Exiting"
@@ -144,7 +148,6 @@ while true ; do
 done
 
 for command in "$@"; do
-  echo "Processing $command in $sub"
-  create "$command" "$sub"
+  create "$command"
   mkexec "$command"
 done
