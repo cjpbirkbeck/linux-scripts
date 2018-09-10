@@ -4,18 +4,17 @@
 # Created by Christopher Birkbeck
 
 if [ -n "$1" ]; then
-  cd "$1" || echo "Error. Cannot find directory $1. Exiting."
-  git status
+  cd "$1" ||  { echo "Error. Cannot find directory $1. Exiting."; exit 1; }
+fi
 
-  if [ "$?" -ne 128 ]; then
-    git fetch upstream
+git status 1>&2 /dev/null
 
-    git merge upstream/master
-    git push -u origin master
-  else
-    echo "Cannot find a git repository!"
-    exit
-  fi
+if [ "$?" -ne 128 ]; then
+  git fetch upstream
+
+  git merge upstream/master
+  git push -u origin master
 else
-  echo "Error. Rquires an argument."
+  echo "Cannot find a git repository!" >&2
+  exit 1
 fi
