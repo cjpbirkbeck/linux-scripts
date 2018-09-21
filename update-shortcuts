@@ -8,7 +8,9 @@ function add_new {
 
   for file in *; do
     if [[ -d $file ]] && [[ $file != ".git" ]]; then
-      add_new $file
+      add_new "$file"
+    elif [[ "$file" == "README.md" ]]; then
+      continue
     else
       if [[ $file =~ (.*).sh ]]; then
         name=${file:0:-3}
@@ -16,9 +18,9 @@ function add_new {
         name=$file
       fi
 
-      orginal=$(readlink -f $file)
+      orginal=$(readlink -f "$file")
 
-      echo -e "alias $name=\"$orginal\"" >> $HOME/bin/shortcuts
+      echo -e "alias $name=\"$orginal\"" >> "$HOME/bin/shortcuts"
     fi
   done
 
@@ -27,9 +29,9 @@ function add_new {
 
 # Removes any duplicated lines.
 function remove_duplicates {
-  awk '!seen[$0]++' $HOME/bin/shortcuts > $HOME/bin/shortcuts-tmp
-  rm $HOME/bin/shortcuts
-  mv $HOME/bin/shortcuts-tmp $HOME/bin/shortcuts
+  awk '!seen[$0]++' "$HOME/bin/shortcuts" > "$HOME/bin/shortcuts-tmp"
+  rm "$HOME/bin/shortcuts"
+  mv "$HOME/bin/shortcuts-tmp" "$HOME/bin/shortcuts"
 }
 
 # Verifies any existing entries still exist.
@@ -41,13 +43,13 @@ function verify {
       echo "Found $current"
       continue
     else
-      sed -i -E -e "s,alias (.*)=\"$current\",,g" $HOME/bin/shortcuts
+      sed -i -E -e "s,alias (.*)=\"$current\",,g" "$HOME/bin/shortcuts"
     fi
-  done <$HOME/bin/shortcuts
+  done <"$HOME/bin/shortcuts"
 }
 
-cd $HOME/bin || mkdir $HOME/bin || { echo "Error. Cannot find or make $HOME/bin. Exiting." >2; Exit 1; }
+cd "$HOME/bin" || mkdir "$HOME/bin" || { echo "Error. Cannot find or make $HOME/bin. Exiting." >2; Exit 1; }
 
-add_new $HOME/bin
+add_new "$HOME/bin"
 remove_duplicates
 verify
