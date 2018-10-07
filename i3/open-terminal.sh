@@ -5,8 +5,8 @@
 prog="$1"
 workspace="$2"
 
-if ( ! i3-msg -t get_tree | jq '.' | grep -E "\"class\": \"$prog-Termite\"" ); then
-  i3-msg "workspace ${2}; exec termite --exec=$prog --class=$prog-Termite"
+if ( ! i3-msg -t get_tree | jq '.' | grep -E "\"class\": \"$prog\"" ); then
+  i3-msg "workspace ${workspace}; exec termite --exec=$prog --class=$prog"
 else
-  i3-msg "[class=\"$prog-Termite\"] focus"
+  i3-msg "[class=\"$prog\"] focus"
 fi
