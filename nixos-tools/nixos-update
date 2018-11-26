@@ -2,8 +2,8 @@
 # Combines rebuilding, garbage collection and optimizing the system
 
 if [[ $(whoami) == "root" ]]; then
-  nixos-rebuild switch --upgrade  && \\
-  nix-collect-garbage --delete-older-than 14d  && \\
+  nixos-rebuild switch --upgrade && \
+  nix-collect-garbage --delete-older-than 14d && \
   nix-store --optimise
 else
   echo "These commands must be run as root."
