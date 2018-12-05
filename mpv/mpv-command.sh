@@ -3,4 +3,4 @@
 # Created on Tuesday December 04, 2018.
 # Created by Christopher Birkbeck
 
-echo '{"command": ["get_property", "media-title"] }' | socat - /tmp/mpvsocket | jq '."data"'
+echo "{\"command\" : [\"set_property\", \"${1}\", \"${2}\"] }" | socat - /tmp/mpvsocket | jq '."data"'
