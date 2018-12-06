@@ -35,8 +35,8 @@ create () {
 
   local location=$(readlink -f $name)
 
-  if [[ $location =~ $HOME/bin/* ]]; then
-    echo -e "alias $original=\"$location\"" >> "$HOME/bin/shortcuts"
+  if [[ $location =~ $HOME/Scripts/* ]]; then
+    echo -e "alias $original=\"$location\"" >> "$HOME/Scripts/shortcuts"
   fi
 }
 
@@ -61,11 +61,11 @@ while true ; do
     -b|--bin)
       if [ -n "$2" ] && [ "${2:0}" != "-" ]; then
         sub="$2"
-        cd "$HOME/bin/$sub" || mkdir "$HOME/bin/$sub"
+        cd "$HOME/Scripts/$sub" || mkdir "$HOME/Scripts/$sub"
         shift
       else
         sub="misc"
-        cd "./$HOME/bin/misc" || mkdir "$HOME/bin/misc"
+        cd "./$HOME/Scripts/misc" || mkdir "$HOME/Scripts/misc"
       fi
 
       if [[ "$?" -ne 0 ]]; then

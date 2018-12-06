@@ -10,5 +10,5 @@ if ( pgrep cmus ); then
 
   twmnc --title " ${status}: " --content "${title}" --bg orange
 else
-  twmnc --title "Error: " --content "CMUS is not opened."
+  twmnc --title "Error: " --content "cmus is not opened."
 fi
