@@ -8,8 +8,8 @@ prog="$2"
 shift 2
 args="$*"
 
-if ( ! i3-msg -t get_tree | jq '.' | grep -E "\"class\": \"${prog}\"" ); then
-  i3-msg "workspace ${workspace}; exec termite --exec=\"${prog} ${args}\" --class=${prog}"
+if ( ! i3-msg -t get_tree | jq '.' | grep -E "\"window_role\": \"${prog}\"" ); then
+  i3-msg "workspace ${workspace}; exec termite --exec=\"${prog} ${args}\" --role=${prog}"
 else
-  i3-msg "[class=\"${prog}\"] focus"
+  i3-msg "[window_role=\"${prog}\"] focus"
 fi

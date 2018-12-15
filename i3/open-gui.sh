@@ -16,7 +16,7 @@ args="$*"
 
 echo "$args"
 
-if ( ! i3-msg -t get_tree | jq '.' | grep -E "\"class\": \"$prog\"" ); then
+if ( ! i3-msg -t get_tree | jq '.' | grep -E -i "\"class\": \"$prog\"" ); then
   i3-msg "workspace ${workspace}; exec ${de} ${prog} ${args}"
 else
   i3-msg "[class=\"$prog\"] focus"
