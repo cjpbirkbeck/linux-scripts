@@ -5,5 +5,5 @@
 
 name=$(date +%F_%T_%p)
 
-maim -s -c 1,0,0,0.6 -p 10 "$HOME/Pictures/screenshots/${name}.png"
+maim -u -s -c 1,0,0,0.6 -p 10 "$HOME/Pictures/screenshots/${name}.png"
 sxiv "$HOME/Pictures/screenshots/${name}.png"

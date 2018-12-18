@@ -5,5 +5,5 @@
 
 name=$(date +%F_%T_%p)
 
-maim -i "$(xdotool getactivewindow)" "$HOME/Pictures/screenshots/${name}.png"
+maim -u -i "$(xdotool getactivewindow)" "$HOME/Pictures/screenshots/${name}.png"
 sxiv "$HOME/Pictures/screenshots/${name}.png"
