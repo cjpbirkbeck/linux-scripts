@@ -4,4 +4,5 @@
 # Created by Christopher Birkbeck
 
 setxkbmap -option ctrl:nocaps
+xmodmap -e 'keycode 78 = Caps_Lock'
 pkill xcape; xcape -e 'Control_L=Escape'

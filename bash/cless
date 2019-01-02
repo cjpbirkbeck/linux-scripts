@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Describe script here.
+# Created on Friday December 28, 2018.
+# Created by Christopher Birkbeck
+
+if [ "$( tput colors )" -ge 256 ]; then
+    colours="xterm256"
+else
+    colours="ansi"
+fi
+
+for file in "$@"; do
+    highlight --replace-tabs=8 --out-format="${colours}" --style=pablo --force -- "$file" | less -R
+done

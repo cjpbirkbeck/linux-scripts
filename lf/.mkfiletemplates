@@ -1,0 +1,10 @@
+shell   sh      .sh
+bash    bash    .sh
+zsh     zsh     .sh
+
+html    html    .html
+css     css     .css
+js      js      .js
+
+nixos   nixos   .nix
+nix     nix     .nix

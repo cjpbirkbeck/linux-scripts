@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Describe script here.
+# Created on Monday December 24, 2018.
+# Created by Christopher Birkbeck
+
+TEMPLATES="$HOME/Templates"
+filetype="$1"
+shift
+
+case "$filetype" in
+    text)
+        ;;
+    sh)
+        ext="sh"
+        template="sh.sh"
+        ;;
+    bash)
+        ext="sh"
+        template="bash.sh"
+        ;;
+    html)
+        ext="html"
+        template="html.html"
+        ;;
+    nixos)
+        ext="nix"
+        template="nixos.nix"
+        ;;
+    *)
+        exit 1
+esac
+
+for name in "$@"; do
+    cp -i "$TEMPLATES/$template" "./${name}.${ext}"
+done

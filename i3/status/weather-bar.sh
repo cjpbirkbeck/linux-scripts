@@ -19,9 +19,10 @@ if [[ $conditions =~ snow ]]; then
   glyph=""
 elif [[ $conditions =~ rain ]]; then
   glyph=""
-elif [[ $conditions =~ sunny ]]; then
+elif [[ $conditions =~ sunny ]] || [[ $conditions =~ clear ]]; then
   glyph=""
-elif [[ $conditions =~ cloudy ]]; then
+elif [[ $conditions =~ cloudy ]] || [[ $conditions =~ overcast ]] \
+  || [[ $conditions =~ mist ]]; then
   glyph=""
 fi
 
