@@ -3,20 +3,9 @@
 set -C -f -u 
 IFS=$'\n'
 
-# ANSI color codes are supported.
-# STDIN is disabled, so interactive scripts won't work properly
-
-# This script is considered a configuration file and must be updated manually.
-
-# Meanings of exit codes:
-# code | meaning    | action of ranger
-# -----+------------+-------------------------------------------
-# 0    | success    | Display stdout as preview
-# 1    | no preview | Display no preview at all
-# 2    | plain text | Display the plain content of the file
-
 # Script arguments
-FILE_PATH="${1}"         # Full path of the highlighted file
+FILE_PATHS="${*}"
+FILE_PATH="${1}"
 
 FILE_EXTENSION="${FILE_PATH##*.}"
 FILE_EXTENSION_LOWER=$(echo "${FILE_EXTENSION}" | tr '[:upper:]' '[:lower:]')
@@ -25,12 +14,15 @@ handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
         txt)
             nvim "${FILE_PATH}"
+            exit
+            ;;
+        jpg|gif|jpeg|png)
+            nohup sxiv -a "${FILE_PATH}" &
             ;;
         # PDF
-        pdf)
+        pdf|epub)
             nohup zathura "${FILE_PATH}" &
             exit 1;;
-
         # OpenDocument
         odt|ods|odp|sxw)
             # Preview as text conversion

@@ -3,17 +3,18 @@
 # Created on Monday December 17, 2018.
 # Created by Christopher Birkbeck
 
-current="$(weather cyul --metric)"
+glyph=""
+current="$(weather cyul --metric 2> /dev/null)"
+
+if (( $? != 0 )); then echo "$glyph No connection"; exit 1; fi
 
 temperature=$(echo "$current" | awk ' /Temperature:/ { print $2 " °" $3 } ')
 
-if echo "$current" | grep "Weather: " ; then
+if (echo "$current" | grep "Weather: ") > /dev/null ; then
   conditions=$(echo "$current" | awk ' /Weather: / { $1 = ""; print } ')
 else
   conditions=$(echo "$current" | awk ' /Sky conditions: / { $1 = ""; $2 = ""; print } ')
 fi
-
-glyph=""
 
 if [[ $conditions =~ snow ]]; then
   glyph=""

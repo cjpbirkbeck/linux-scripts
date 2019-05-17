@@ -1,1 +1,0 @@
-/home/cjpbirkbeck/bin:/run/wrappers/bin:/home/cjpbirkbeck/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/etc/profiles/per-user/cjpbirkbeck/bin

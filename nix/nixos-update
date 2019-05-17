@@ -3,8 +3,8 @@
 
 if [[ $(whoami) == "root" ]]; then
   nixos-rebuild switch --upgrade && \
-  nix-collect-garbage --delete-older-than 14d && \
-  nix-store --optimise
+  nix-collect-garbage --delete-older-than 7d && \
+  nix optimise-store
 else
   echo "These commands must be run as root."
   exit 1

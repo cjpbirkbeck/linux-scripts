@@ -1,0 +1,9 @@
+# Mime types          view                                          edit
+text/*"               "cless"                                       "nvim
+application/pdf"      "zathura"                                     "-
+application/epub+zip" "zathura"                                     "-
+image/gif"            "sxiv -a"                                     "gimp
+image/svg+xml"        "qutebrowser"                                 "inkscape
+image/*"              "sxiv"                                        "kolourpaint
+audio/*"              "mpv --input-ipc-serv=/tmp/mpvsocket"         "-
+video/*"              "mpv --input-ipc-serv=/tmp/mpvsocket"         "-
