@@ -1,3 +1,5 @@
+# Functions to load with bash, mostly to jump to various directories.
+
 function fuzzy_cd {
     [ $# -gt 0 ] && fasd_cd -d "$*" && return
     local dir
@@ -18,7 +20,7 @@ if [ -n "$1" ]; then
 
   cd "$npath" || exit
 else
-  echo "No valid package. exiting."
+  echo "No valid argument. exiting."
   exit 1
 fi
 }
