@@ -1,4 +1,0 @@
-# type, open,location,conditions,previewers
-
-image,sxiv -a,$HOME/Pictures/,-name *.png* -o -name *.jpg* -o *.gif*,$HOME/.config/ranger/scope.sh 40 40 {} False
-pdf,zathura --fork,-name *.pdf -o -name *.epub -o,$HOME/.config/ranger/scope.sh 40 40 {} False
