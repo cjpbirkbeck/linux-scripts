@@ -2,7 +2,7 @@
 
 # Fuzzy finds music and audio tracks and adds it to cmus' play queue.
 
-audio=$(find $HOME/Music $HOME/Audio -name *.ogg -o -name *.mp3 -o -name *.wma | fzf --multi --preview '~/.config/ranger/scope.sh {} 50 50 ~/.testing False' --preview-window=right:60 | sed -E 's/^(.*)$/"\1"/g')
+audio=$(find $HOME/Music $HOME/Audio -name *.ogg -o -name *.mp3 -o -name *.wma | fzf --querry="${1}" --prompt="Audio> " --select-1 --exit-0 --multi --preview '~/.config/ranger/scope.sh {} 50 50 ~/.testing False' --preview-window=right:60 | sed -E 's/^(.*)$/"\1"/g')
 
 cmus_id=$(pgrep cmus)
 
