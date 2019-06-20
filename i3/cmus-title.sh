@@ -8,7 +8,7 @@ if ( pgrep cmus ); then
   status=$(echo -e "${cmus}" | awk ' /status/ { print $2 }' | sed -E -e 's/\b[a-z]/\u&/g')
   title=$(echo -e "${cmus}" | grep -E -n 'tag title' | sed -E -e 's/tag title//g')
 
-  twmnc --title " ${status}: " --content "${title}" --bg orange
+  twmnc --title " ${status}: " --content "${title}"
 else
   twmnc --title "Error: " --content "cmus is not opened."
 fi
