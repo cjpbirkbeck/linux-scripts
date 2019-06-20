@@ -1,0 +1,6 @@
+name,filename,final_prefix
+sh,blank.sh,.sh
+bash,blank.bash,.sh
+html,blank.html,.html
+css,blank.css,.css
+nixos,blank-nixos.nix,.nix
