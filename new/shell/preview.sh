@@ -2,12 +2,16 @@
 # Generates a previews of a file, based on its file extension and mimetype.
 # Otherwise, it prints out what finds.
 
+# Based off Ranger's scope.sh and a suggested revision for lf.
+# Latest Ranger scope.sh: https://github.com/ranger/ranger/blob/master/ranger/data/scope.sh
+# Suggested lf scope.sh: https://github.com/gokcehan/lf/wiki/Ranger
+
 set -C -f
 IFS=$'\n'
 
 # Arguments
 FILE_PATH="${1}"
-WINDOW_WIDTH="${2:-100}"
+WINDOW_WIDTH="${2:-60}"
 FILE_EXT="${FILE_PATH##*.}"
 FILE_EXT_LOWER=$(echo "${FILE_EXT}" | tr '[:upper:]' '[:lower:]')
 
@@ -23,6 +27,8 @@ detect_colour() {
     fi
 }
 
+
+
 handle_extension() {
     case "${FILE_EXT_LOWER}" in
         a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
@@ -33,6 +39,13 @@ handle_extension() {
         pdf)
             pdftotext -l 10 -nopgbrk -q -- "${FILE_PATH}" - | fold
             exiftool "${FILE_PATH}" | fold
+            exit 1
+            ;;
+        epub)
+            # NOTE: pandoc is quite slow, slower than should allowed for a script
+            # like this. It should be replace with something like epub2txt2, if I
+            # can get it to work.
+            pandoc -i "${FILE_PATH}" --to=plain | fold
             exit 1
             ;;
         torrent)
@@ -47,6 +60,17 @@ handle_extension() {
             w3m -dump "${FILE_PATH}" | fold
             exit 1
             ;;
+        json)
+            jq --color-output . "${FILE_PATH}" | fold
+            exit 1
+            ;;
+        doc)
+            catdoc "${FILE_PATH}" | fold
+            exit 1
+            ;;
+        docx)
+            catdocx "${FILE_PATH}" | fold
+            exit 1
     esac
 }
 
@@ -54,10 +78,14 @@ handle_mime() {
     local MIMETYPE="${1}"
 
     case "${MIMETYPE}" in
-        text/* | */xml)
+        text/plain)
+            fold --width=60 --spaces "${FILE_PATH}"
+            exit 2
+            ;;
+        text/* | */*xml)
             detect_colour
             highlight --replace-tabs="4" --out-format="${PRINT_COLOURS}" \
-                --style="${COLOUR_STYLE}" --wrap-simple --force -- "${FILE_PATH}"
+                --style="${COLOUR_STYLE}" --wrap --line-length="${WINDOW_WIDTH}" --force -- "${FILE_PATH}"
             exit 2
             ;;
         # Images
@@ -67,8 +95,8 @@ handle_mime() {
             exit 1
             ;;
         video/*|audio/*|application/octet-stream)
-            mediainfo "${FILE_PATH}"
-            exifinfo "${FILE_PATH}"
+            mediainfo "${FILE_PATH}" | fold --width=60 --spaces
+            exiftool "${FILE_PATH}" | fold --width=60 --spaces
             exit 1
             ;;
     esac
@@ -77,7 +105,7 @@ handle_mime() {
 handle_fallback() {
     local mimetype="${1}"
 
-    echo "Previewer cannot generate preview based on its extension or mimetype."
+    echo "Previewer cannot generate a preview based on its extension or mimetype."
     echo "File Extension: ${FILE_EXT}"
     echo "Mime Type: ${mimetype}"
     exit 1
