@@ -27,7 +27,78 @@ detect_colour() {
     fi
 }
 
+process_pdf () {
+    pdftotext -l 10 -nopgbrk -q -- "${FILE_PATH}" - | fold --spaces --width="${WINDOW_WIDTH}"
+    exiftool "${FILE_PATH}" | fold --spaces --width="${WINDOW_WIDTH}"
+    exit 1
+}
 
+process_epub () {
+    # NOTE: pandoc is quite slow, slower than should allowed for a script
+    # like this. It should be replace with something like epub2txt2, if I
+    # can get it to work.
+    pandoc -i "${FILE_PATH}" --to=plain | fold --spaces --width="${WINDOW_WIDTH}"
+    exit 1
+}
+
+process_extension() {
+    atool --list -- "${FILE_PATH}"
+    exit 1
+}
+
+process_torrent() {
+    transmission-show -- "${FILE_PATH}" | fold
+    exit 1
+}
+
+process_opendocs() {
+    odt2txt "${FILE_PATH}" --width="${WINDOW_WIDTH}" | fold
+    exit 1
+}
+
+process_ms_word() {
+    catdoc "${FILE_PATH}" | fold
+    exit 1
+}
+
+process_ms_wordx() {
+    catdocx "${FILE_PATH}" | fold
+    exit 1
+}
+
+process_json() {
+    jq --color-output . "${FILE_PATH}" | fold
+    exit 1
+}
+
+process_html() {
+    w3m -dump "${FILE_PATH}" | fold
+    exit 1
+}
+
+process_plain_text() {
+    fold --width=60 --spaces "${FILE_PATH}"
+    exit 2
+}
+
+process_struct_text() {
+    detect_colour
+    highlight --replace-tabs="4" --out-format="${PRINT_COLOURS}" \
+        --style="${COLOUR_STYLE}" --wrap --line-length="${WINDOW_WIDTH}" --force -- "${FILE_PATH}"
+    exit 2
+}
+
+process_image() {
+    img2txt --gamma=0.6 -- "${FILE_PATH}" && exit 1
+    exiftool "${FILE_PATH}"
+    exit 1
+}
+
+process_multimedia() {
+    mediainfo "${FILE_PATH}" | fold --width=60 --spaces
+    exiftool "${FILE_PATH}" | fold --width=60 --spaces
+    exit 1
+}
 
 handle_extension() {
     case "${FILE_EXT_LOWER}" in
