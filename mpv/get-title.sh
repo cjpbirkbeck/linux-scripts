@@ -4,7 +4,7 @@
 # Created by Christopher Birkbeck
 
 if ( echo 'stuff' | socat - /tmp/mpvsockat ); then
-  twmnc --title "Playing: " --content "$(echo '{"command": ["get_property", "media-title"] }' | socat - /tmp/mpvsocket | jq '."data"')" --bg orange
+  twmnc --title "Playing: " --content "$(echo '{"command": ["get_property", "media-title"] }' | socat - /tmp/mpv-socket | jq '."data"')" --bg orange
 else
   twmnc --title "Error: " --content "mpv is not playing right now."
 fi

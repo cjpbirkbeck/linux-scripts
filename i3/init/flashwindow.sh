@@ -4,4 +4,4 @@
 # Created by Christopher Birkbeck
 
 cd "/home/cjpbirkbeck/Development/python3/flashfocus" || exit 1
-nix-shell --run /home/cjpbirkbeck/Development/python3/flashfocus/_build/pip_packages/bin/flashfocus
+nix-shell --run /home/cjpbirkbeck/Development/python3/flashfocus-new/_build/pip_packages/bin/flashfocus

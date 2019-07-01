@@ -3,5 +3,5 @@
 # Created on Monday December 24, 2018.
 # Created by Christopher Birkbeck
 
-next=$(fasd -dlR | rofi -dmenu -p "Dir: ")
+next=$(fasd -dlR | rofi -dmenu -p "Dir")
 termite --directory="$next"

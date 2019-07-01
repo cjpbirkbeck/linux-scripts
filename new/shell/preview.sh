@@ -177,6 +177,7 @@ handle_fallback() {
     local mimetype="${1}"
 
     echo "Previewer cannot generate a preview based on its extension or mimetype."
+    echo "File Path: ${FILE_PATH}"
     echo "File Extension: ${FILE_EXT}"
     echo "Mime Type: ${mimetype}"
     exit 1
